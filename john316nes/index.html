@@ -1,33 +1,17 @@
-<head>
-  <script type="text/javascript" src="https://cdn.rawgit.com/takahirox/nes-js/v0.0.1/build/nes.min.js"></script>
-  <script type="text/javascript" >
-    function init() {
-      var url = 'John316.nes';
-      var request = new XMLHttpRequest();
-      request.responseType = 'arraybuffer';
+<!DOCTYPE html>
 
-      request.onload = function() {
-        var buffer = request.response;
-        var nes = new NesJs.Nes();
-
-        nes.setRom(new NesJs.Rom(buffer));
-        nes.setDisplay(new NesJs.Display(document.getElementById('gameCanvas')));
-
-        window.onkeydown = function(e) { nes.handleKeyDown(e); };
-        window.onkeyup = function(e) { nes.handleKeyUp(e); };
-
-        nes.bootup();
-        nes.run();
-      };
-
-      request.open('GET', url, true);
-      request.send(null);
-    }
-  </script>
-</head>
-
-<body onload="init()">
-  <p>
-    <canvas id="gameCanvas" width="256" height="240"></canvas>
-  </p>
-</body>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Embedding Example</title>
+		
+		<script type="text/javascript" src="jsnes.min.js"></script>
+		<script type="text/javascript" src="nes-embed.js"></script>
+		<script>window.onload = function(){nes_load_url("nes-canvas", "John316.nes");}</script>
+	</head>
+	<body>
+		<div style="margin: auto; width: 75%;">
+			<canvas id="nes-canvas" width="256" height="240" style="width: 100%"/>
+		</div>
+	</body>
+</html>
