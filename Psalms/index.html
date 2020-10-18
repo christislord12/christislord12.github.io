@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<body style="background-color:#808080;">
+
+		
+        <title>Panda3D WebGL Live Python Editor</title>
+            <style type="text/css">
+                body {
+                    
+                    font-family: Roboto, sans-serif;
+                    margin: 0px;
+                    padding: 0px;
+	                background-color: #808080;
+					
+                    overflow: hidden;
+                }
+            html {
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+            }
+            div#main {
+                display: block;
+                background-color: #808080;
+				
+            }
+            img#logo {
+                margin-top: 15%;
+            }
+            span#ldtext {
+                display: block;
+                font-size: 13pt;
+                margin-top: 80px;
+            }
+
+            a {
+                color: #eee;
+                text-decoration: none;
+            }
+            a:hover {
+                color: #eee;
+                text-decoration: underline;
+            }
+            div#ldbar-outer {
+                display: inline-block;
+                margin-top: 15px;
+                height: 11px;
+                width: 400px;
+                text-align: left;
+            }
+            div#ldbar {
+                width: 0%;
+                height: 100%;
+            }
+            div#header {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                height: 50px;
+                right: 0px;
+            }
+            div#toolbar {
+                position: absolute;
+                top: 0px;
+                left: -10000px;
+                bottom: 50px;
+                right: 0px;
+            }
+            i.fa.fa-chevron-down {
+                float: right;
+            }
+            div#panel-input {
+                margin: 0;
+                position: absolute;
+                top: 50px;
+                bottom: 35px;
+                right: 0;
+                left: 800px;
+            }
+            div#panel-output {
+                margin: 0;
+                position: absolute;
+                top: 0px;
+                bottom: 35px;
+                left: 0;
+                width: 800px;
+                text-align: center;
+            }
+            #editor {
+                margin: 0;
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                bottom: 0px;
+                right: 0px;
+            }
+
+            #console {
+                white-space: pre-wrap;
+            }
+            #console .warning {
+                color: gold;
+            }
+            #console .error {
+                color: red;
+            }
+            button, .dropdown-content a {
+                width: 150px;
+                border: none;
+                font-weight: bold;
+                text-align: center;
+                color: white;
+                padding: 8px;
+                margin: 7px;
+                font-family: Roboto, sans-serif;
+            }
+            button:hover {
+                cursor: pointer;
+            }
+            button:active {
+            }
+            button:disabled {
+            }
+            .dropdown:hover > button, .dropdown:active > button {
+            }
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                margin: -7px 7px -7px 7px;
+                padding: 0px;
+                min-width: 150px;
+                z-index: 10;
+            }
+            .dropdown-content button {
+                text-align: left;
+                margin: 3px 0px;
+            }
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+            
+            div#main {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+            }
+            </style>
+            <script type="text/javascript">
+                function runCode() {
+                    document.getElementById("ld").style.display = "none";
+                    document.getElementById("canvas").style.display = "block";
+                    
+                    var stopFunc =  Module.cwrap('stopPythonCode', 'number');
+                    stopFunc();
+                    
+                    document.getElementById("console").innerHTML = '';
+                    var runFunc =  Module.cwrap('runPythonCode', 'number', ['string']);
+                    runFunc(editor.getValue());
+                    //stopCode()
+                   // window.setTimeout(stopCode, 5);
+                    
+                }
+            function stopCode() {
+                var stopFunc =  Module.cwrap('stopPythonCode', 'number');
+                stopFunc();
+                document.getElementById('stop-button').disabled = true;
+            }
+            samples = [
+    'from panda3d.core import loadPrcFileData\nloadPrcFileData("", "sync-video t")\nloadPrcFileData("", "show-frame-rate-meter f")\nloadPrcFileData("", "win-size 800 600")\nfrom direct.showbase.ShowBase import ShowBase\nfrom panda3d.core import *\nfrom direct.gui.OnscreenText import OnscreenText\nfrom direct.gui.DirectGui import *\nfrom direct.task import Task\nfrom direct.showbase.DirectObject import DirectObject\nimport sys\nclass Game(DirectObject):\n    def __init__(self):\n        base = ShowBase()\n        self.forward_speed = 5.0 # units per second\n        self.backward_speed = 2.0\n        self.forward_button = KeyboardButton.ascii_key("w")\n        self.backward_button = KeyboardButton.ascii_key("s")\n        self.in_button = KeyboardButton.ascii_key("d")\n        self.out_button = KeyboardButton.ascii_key("a")\n        self.space_button = KeyboardButton.space()\n        self.pagenumber = 1\n       # base.setBackgroundColor(1,1,1)\n        base.accept("escape",sys.exit)\n        base.useTrackball()\n        base.trackball.node().setPos(-7.55,0,6)\n        self.image = self.loadImageAsPlane("ReadingThePsalmsWithLuther" + str(self.pagenumber) + ".jpg")\n        self.image.reparentTo(render)\n        self.image.setPos(8,15,-6)\n        self.image.setScale(1.4)\n        onebutton = DirectButton(text = ("Next"), scale=.06, command=self.nextpage)\n        onebutton.setPos(-1.2,0,0.7)\n        twobutton = DirectButton(text = ("Previous"), scale=.06, command=self.previouspage)\n        twobutton.setPos(-1.2,0,0.9)\n        threebutton = DirectButton(text = ("Jump10"), scale=.06, command=self.jump10)\n        threebutton.setPos(-1.2,0,0.5)\n        fourbutton = DirectButton(text = ("Jump50"), scale=.06, command=self.jump50)\n        fourbutton.setPos(-1.2,0,0.3)\n        fivebutton = DirectButton(text = ("Jump100"), scale=.06, command=self.jump100)\n        fivebutton.setPos(-1.2,0,0.1)\n        sixbutton = DirectButton(text = ("Jump200"), scale=.06, command=self.jump200)\n        sixbutton.setPos(-1.2,0,-0.1)\n        self.accept("arrow_up", self.previouspage)\n        self.accept("arrow_down", self.nextpage)\n        self.accept("1", self.jump10)\n        self.accept("2", self.jump25)\n        self.accept("3", self.jump50)\n        self.accept("4", self.jump100)\n        self.accept("5", self.jump200)\n        self.accept("6", self.jump500)\n        taskMgr.add(self.exampleTask, "MyTaskName")\n    def loadimage(self):\n        self.image.removeNode();\n        self.image = self.loadImageAsPlane("ReadingThePsalmsWithLuther" + str(self.pagenumber) + ".jpg")\n        self.image.reparentTo(render)\n        self.image.setPos(8,15,-6)\n        self.image.setScale(1.4)\n    def previouspage(self):\n        base.trackball.node().setPos(-7.55,0,6)\n        self.pagenumber=self.pagenumber-1\n        try :\n            self.loadimage()\n        except IOError:\n            self.pagenumber = 1\n            self.loadimage()\n    def nextpage(self):\n        base.trackball.node().setPos(-7.55,0,6)\n        self.pagenumber=self.pagenumber+1\n        try :\n            self.loadimage()\n        except IOError:\n            self.pagenumber = 1\n            self.loadimage()\n    def jump10(self):\n        base.trackball.node().setPos(-7.55,0,6)\n        self.pagenumber=self.pagenumber+10\n        try :\n            self.loadimage()\n        except IOError:\n            self.pagenumber = 1\n            self.loadimage()\n    def jump25(self):\n        base.trackball.node().setPos(-7.55,0,6)\n        self.pagenumber=self.pagenumber+25\n        try :\n            self.loadimage()\n        except IOError:\n            self.pagenumber = 1\n            self.loadimage()\n    def jump50(self):\n        base.trackball.node().setPos(-7.55,0,6)\n        self.pagenumber=self.pagenumber+50\n        try :\n            self.loadimage()\n        except IOError:\n            self.pagenumber = 1\n            self.loadimage()\n    def jump100(self):\n        base.trackball.node().setPos(-7.55,0,6)\n        self.pagenumber=self.pagenumber+100\n        try :\n            self.loadimage()\n        except IOError:\n            self.pagenumber = 1\n            self.loadimage()\n    def jump200(self):\n        base.trackball.node().setPos(-7.55,0,6)\n        self.pagenumber=self.pagenumber+200\n        try :\n            self.loadimage()\n        except IOError:\n            self.pagenumber = 1\n            self.loadimage()\n    def jump500(self):\n        base.trackball.node().setPos(-7.55,0,6)\n        self.pagenumber=self.pagenumber+500\n        try :\n            self.loadimage()\n        except IOError:\n            self.pagenumber = 1\n            self.loadimage()\n    def exampleTask(self,task):\n        base.trackball.node().setPos(-7.55, base.trackball.node().getY(), base.trackball.node().getZ())\n        base.trackball.node().setHpr(0, 0, 0)\n        if (base.trackball.node().getY() < -12):\n            {\n            base.trackball.node().setY(-12)\n            }\n        if (base.trackball.node().getY() > 1):\n            \n            base.trackball.node().setY(1)\n            \n            \n        if (base.trackball.node().getZ() < 4):\n            \n            base.trackball.node().setZ(4)\n            \n        if (base.trackball.node().getZ() > 8):\n            \n            base.trackball.node().setZ(8)\n            \n        speed = 0.0\n        #self.image.setScale(0.2) \n        is_down = base.mouseWatcherNode.is_button_down\n        if is_down(self.forward_button):\n            speed += self.forward_speed\n            y_delta = -5 * globalClock.get_dt()\n            base.trackball.node().set_z(base.trackball.node().getZ() + y_delta)\n        if is_down(self.backward_button):\n            speed -= self.backward_speed\n            y_delta = 5 * globalClock.get_dt()\n            base.trackball.node().set_z(base.trackball.node().getZ() + y_delta)\n        if is_down(self.in_button):\n            speed -= self.backward_speed\n            y_delta = 5 * globalClock.get_dt()\n            base.trackball.node().set_y(base.trackball.node().getY() - y_delta)\n        if is_down(self.out_button):\n            speed -= self.backward_speed\n            y_delta = 5 * globalClock.get_dt()\n            base.trackball.node().set_y(base.trackball.node().getY() + y_delta)\n        if is_down(self.space_button):\n            speed -= self.backward_speed\n            y_delta = 5 * globalClock.get_dt()\n            base.trackball.node().set_z(base.trackball.node().getZ() + y_delta)\n        return task.cont\n    def loadImageAsPlane(self, filepath, yresolution = 600):\n        	tex = loader.loadTexture(filepath)\n        	tex.setBorderColor(Vec4(0,0,0,0))\n        	tex.setWrapU(Texture.WMBorderColor)\n        	tex.setWrapV(Texture.WMBorderColor)\n        	cm = CardMaker(filepath + " card")\n        	cm.setFrame(-tex.getOrigFileXSize(), tex.getOrigFileXSize(), -tex.getOrigFileYSize(), tex.getOrigFileYSize())\n        	card = NodePath(cm.generate())\n        	card.setTexture(tex)\n        	card.setScale(card.getScale()/ yresolution)\n        	card.flattenLight()\n        	return card     \nfgame = Game()\nbase.run()\n'];
+                      
+                       function loadSample(index) {
+                           editor.setValue(samples[index] || "# No such sample program defined.");
+                       }
+            </script>
+    </head>
+    
+    <body>
+        <div id="header">
+            <div id="toolbar">
+                <button id="play-button" onclick="runCode()" disabled><i class="fa fa-play" aria-hidden="true"></i> Run Code</button>
+                <button id="stop-button" onclick="stopCode()" disabled><i class="fa fa-stop" aria-hidden="true"></i> Stop</button>
+                
+            </div>
+        </div>
+        </div>
+        <div id="panel-input">
+            <pre id="editor"></pre>
+        </div>
+        <div id="panel-output">
+            <div id="main">
+                <div id="ld">
+                    <img id="logo" src="logo.png" alt="[logo]">
+                        <span id="ldtext">Uh, you have JavaScript disabled. This application won't work.</span>
+                        <script type="text/javascript">
+                            var ldtext = document.getElementById("ldtext");
+                            ldtext.innerHTML = "Checking browser compatibility...";
+                            </script>
+                        <div id="ldbar-outer">
+                            <div id="ldbar"></div>
+                        </div>
+                        </div>
+                <canvas id="canvas" style="display:none;" oncontextmenu="event.preventDefault()"></canvas>
+            </div>
+            <div id="console" class="ace_editor ace-monokai ace_scroller"></div>
+        </div>
+                
+        <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script>
+            document.getElementById('editor').innerHTML = samples[0];
+            editor = ace.edit("editor");
+            editor.setTheme("ace/theme/monokai");
+            editor.session.setMode("ace/mode/python");
+            editor.container.style.opacity=0 // or use svg filter to make it gray
+            editor.container.style.pointerEvents="none"
+            editor.renderer.setStyle("disabled", true)
+
+            
+            </script>
+        
+        <script type="text/javascript">
+            // The URL of the asm.js resource to load.
+            var EMSCRIPTEN_ASM = 'editor2.js';
+            // The uncompressed size of that resource (in bytes).
+            var ASM_SIZE = 25355747;
+            
+            var ldtext = document.getElementById("ldtext");
+            var ldbar = document.getElementById("ldbar");
+            var ld = document.getElementById("ld");
+            var canvas = document.getElementById("canvas");
+            
+            var Module = {
+                preRun: [],
+                postRun: [],
+                    
+                                            canvas: (function() {
+                                            var canvas = document.getElementById('canvas');
+                                            canvas.contentEditable = true;
+                                            canvas.setAttribute("tabindex", "0");
+                                            // Focus the canvas when the mouse enters it.
+                                            canvas.addEventListener('mouseenter',function() {canvas.focus();},false);
+                                            return canvas;
+                                            })(),
+                                            setStatus: function(text) {
+                                                var newString;
+                                                if (text.indexOf("Downloading data... (") === 0) {
+                                                    newString = 'Downloading data...';
+                                                    var parts = text.substring(21, text.length - 1).split('/');
+                                                    var percentComplete = (parseInt(parts[0]) / parseInt(parts[1])) * 100
+                                                    ldbar.style.width = percentComplete + '%';
+                                                } else {
+                                                    newString = text;
+                                                }
+                                                if (newString != ldtext.innerHTML) {
+                                                    ldtext.innerHTML = newString;
+                                                    
+                                                }
+                                                if (text === 'Done!') {
+                                                    ldtext.innerHTML = 'Click "Run Code" to begin.';
+                                                    runCode()
+                                                    //window.setTimeout(runCode, 0);
+                                                    document.getElementById('ldbar-outer').style.display = 'none';
+                                                    document.getElementById('play-button').disabled = false;
+                                                    //document.getElementById('fullscreen-button').disabled = false;
+                                                }
+                                            },
+                                            totalDependencies: 0,
+                                            monitorRunDependencies: function(left) {
+                                                this.totalDependencies = Math.max(this.totalDependencies, left);
+                                                var percentComplete = ((this.totalDependencies - left) / this.totalDependencies) * 100;
+                                                ldbar.style.width = percentComplete + '%';
+                                            },
+            };
+        
+        var memoryInitializer = 'editor2.js.mem';
+        if (typeof Module['locateFile'] === 'function') {
+            memoryInitializer = Module['locateFile'](memoryInitializer);
+        } else if (Module['memoryInitializerPrefixURL']) {
+            memoryInitializer = Module['memoryInitializerPrefixURL'] + memoryInitializer;
+        }
+        var xhr = Module['memoryInitializerRequest'] = new XMLHttpRequest();
+        xhr.open('GET', memoryInitializer, true);
+        xhr.responseType = 'arraybuffer';
+        xhr.send(null);
+        
+        function updateProgress(evt) {
+            var percentComplete = (evt.loaded / ASM_SIZE) * 100;
+            ldbar.style.width = percentComplete + '%';
+        }
+        
+        function sendreq() {
+            ldtext.innerHTML = "Downloading application...";
+            
+            var req = new XMLHttpRequest();
+            req.onprogress = updateProgress;
+            req.open('GET', EMSCRIPTEN_ASM, true);
+            
+            req.onreadystatechange = function(aEvt) {
+                if (req.readyState == 4) {
+                    Module.setStatus("Loading...");
+                    setTimeout(function() {
+                               var blob = new Blob([req.responseText], {
+                                                   type: 'text/javascript'
+                                                   });
+                               var script = document.createElement("script");
+                               script.type = "text/javascript";
+                               script.async = true;
+                               script.defer = true;
+                               script.src = URL.createObjectURL(blob);
+                               //script.text = req.responseText;
+                               document.body.appendChild(script);
+                               
+                               }, 0);
+                }
+            };
+            req.send();
+        }
+        window.onload = function() {
+            try {
+                gl = canvas.getContext("experimental-webgl") || canvas.getContext("webgl");
+            } catch (x) {
+                gl = null;
+            }
+            if (gl) {
+                ldbar.style.display = "block";
+                sendreq();
+            } else {
+                ldtext.innerHTML = "WebGL support is required by this application.";
+            }
+        }
+        window.onerror = function(event) {
+            // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+            ldtext.innerHTML = 'Exception thrown, see JavaScript console';
+        };
+        </script>
+    </body>
+</html>
